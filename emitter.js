@@ -44,7 +44,8 @@ function particleShapes( allowLargePaths ){
 
 //**************
 //Emitter class
-function PEmitter( container , data){
+window.PEmitter = function( container , data){
+    data = !data ? {} : data;
     //**************************************************
     this.emter  = document.getElementById(container?container:"emitter"); //Get the emitter container
     //**************************************************
