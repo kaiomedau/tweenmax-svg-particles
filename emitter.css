@@ -1,0 +1,27 @@
+/* https://github.com/kaiomedau */
+
+html,body{
+  height:100%;
+  background:#000;
+}
+
+#emitter, #emitter_2{
+  height:100px; width:100px; /*Very important attributes to calculate particles init position*/
+  position: relative;
+}
+
+.particle{
+  position: absolute;
+}
+
+/* Particle fill and stroke classes */
+.blue{ fill: #00aeef; }
+.blue.stroke{ stroke: #00aeef; }
+
+.white{ fill: #fff; }
+.white.stroke{ stroke: #ffffff; }
+
+.stroke{
+  fill: none;
+  stroke-width:1.5px;
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<!-- https://github.com/kaiomedau -->
+<html>
+  <head>
+    <title>TweenMax SVG Particles</title>
+
+    <!--   Load stylesheet   -->
+    <link rel="stylesheet" href="emitter.css">
+    <!--   Finish loading   -->
+
+  </head>
+  <body>
+    <div id="emitter"></div>
+    <div id="emitter_2"></div>
+
+    <!--   Load dependencies   -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js"></script>
+    <!--   Load Emitter code   -->
+    <script src="emitter.js"></script>
+    <!--   Finish loading   -->
+
+    <script type="text/javascript">
+    //************************************************
+      //Create emitters
+      var eM   = new PEmitter( "emitter"  , { count:300, radial:true, large:true, x:"50%", y:"50%" } );
+      //Set a interval to cast all particles async
+      var int   = window.setInterval( function(){ eM.cast( int ); }, 300);
+    //************************************************
+    </script>
+
+  </body>
+</html>
