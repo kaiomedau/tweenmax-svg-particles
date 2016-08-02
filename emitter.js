@@ -17,8 +17,7 @@ function getRandom( arrayObj ){
 // EMITTER
 //*****************************************************************
 
-var classes = [ "blue", "blue stroke", "white", "white stroke"],//Classes to be randomized
-    tweens = [];//Collection container. Will hold all created tweens to handle mouse interacions
+var tweens = [];//Collection container. Will hold all created tweens to handle mouse interacions
 
 //All particle shapes
 function particleShapes( allowLargePaths ){
