@@ -1,4 +1,4 @@
-# TweenmMax svg-particles
+# TweenMax svg-particles
 Simple javascript SVG particles using TweenMax (GSAP) to handle the animation actions.
 
 
@@ -34,7 +34,8 @@ Add a script tag to initialize your emitter, passing at least the `container uni
     //Set a interval to cast all particles async
     //Pass the interval object as parameter to be cleared once it's done
     var emInterval = window.setInterval( function(){ eM.cast( emInterval ); }, 300);
-</script>```
+</script>
+```
 
 
 ## Configurations
