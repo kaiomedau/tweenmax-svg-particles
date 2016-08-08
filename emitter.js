@@ -21,21 +21,20 @@ var tweens = [];//Collection container. Will hold all created tweens to handle m
 
 //All particle shapes
 function particleShapes( allowLargePaths ){
-  //Small shape coors
   var smallShapes = [
-    {size:{w:80,h:20}, points:"80 0 0 0 25 20"},
-    {size:{w:50,h:40}, points:"0 0 50 0 25 40"},
-    {size:{w:10,h:10}, points:"10 0 0 0.30 6 8 9 0"},
-    {size:{w:45,h:20}, points:"0 0 45 11 10 20"},
-    {size:{w:24,h:14}, points:"2 6 23 0 21 14"},
-    {size:{w:24,h:24}, points:"4 3 21 1 2 16"},
-    {size:{w:23,h:23}, points:"10 2 2 21 23 13"},
-    {size:{w:24,h:24}, points:"3 1 12 5 1 11"},
-    {size:{w:12,h:16}, points:"9 2 11 11 2 16"},
+    {size:{w:85,h:21}, points:"80 0 0 0 25 20"},
+    {size:{w:51,h:41}, points:"0 0 50 0 25 40"},
+    {size:{w:11,h:9},  points:"10 0 0 0 6 8"},
+    {size:{w:47,h:21}, points:"0 0 45 11 10 20"},
+    {size:{w:23,h:16}, points:"2 6 23 0 21 14"},
+    {size:{w:22,h:17}, points:"4 3 21 1 2 16"},
+    {size:{w:24,h:21}, points:"10 2 2 21 23 13"},
+    {size:{w:13,h:12}, points:"3 1 12 5 1 11"},
+    {size:{w:11,h:17}, points:"9 2 11 11 2 16"},
   ];
   //Large shapes coords
   var largeShapes = [
-    {size:{w:100,h:140}, points:"10 14 90 21 100 140"},
+    {size:{w:100,h:141}, points:"10 14 90 21 100 140"},
   ];
   //return it
   return allowLargePaths ? smallShapes.concat( largeShapes ) : smallShapes;
@@ -49,7 +48,7 @@ window.PEmitter = function( container , data){
     this.emter  = document.getElementById(container?container:"emitter"); //Get the emitter container
     //**************************************************
     this.clsses     = data.classes  ? data.classes  : classes; //Classes to randomize
-    this.pCount     = data.count    ? data.count    : 100, //Number of particles
+    this.pCount     = data.count    ? data.count    : 30, //Number of particles
     this.pRangeX    = data.rangeX   ? data.rangeX   : 800, //Max distance X (btween 0 and given number)
     this.pRFromX    = data.rFromX   ? data.rFromX   : 0,
     this.pRangeY    = data.rangeY   ? data.rangeY   : 800, //Max Y position (btween pRangeFromY and given number)
@@ -59,6 +58,13 @@ window.PEmitter = function( container , data){
     this.radial     = data.radial   ? data.radial   : false, //If emitter will emitte to all sides
     this.allowLarge = data.large    ? data.large    : false,
     this.shapes     = data.shapes   ? data.shapes   : null,
+    this.pz         = data.z        ? data.z        : 0,
+    this.opacity    = data.alpha    ? data.alpha    : 1,
+    this.rotation   = data.rotate!=null ? data.rotate : true,
+    this.rotVel     = data.rVelo    ? data.rVelo    : 10,
+    this.rotVelVar  = data.rVeloVar ? data.rVeloVar : 30,
+    this.rotDirect  = data.rotDir   ? data.rotDir   : "cw",
+    this.static     = data.static!=null ? data.static : false,
     this.particles  = 0;   //Controll var, contains loaded particles
 
     //If new position given
@@ -77,7 +83,7 @@ PEmitter.prototype.create = function(){
       ny    = Math.randMinMax(this.radial ? -(this.pRangeY + this.pRFromY) : this.pRFromY, this.pRangeY),
       fx    = nx > 0 ? this.pRFromX : -this.pRFromX,
       fy    = ny > 0 ? this.pRFromY : -this.pRFromY,
-      time  = Math.random() * this.pLifeVar + this.pLife;
+      time  = (Math.random() * this.pLifeVar) + this.pLife;
 
     //Get random path coordinates
     var pshape = this.shapes ? getRandom( this.shapes ) : getRandom( particleShapes( this.allowLarge ) );
@@ -90,7 +96,6 @@ PEmitter.prototype.create = function(){
         rect.setAttribute('points',  pshape.points);
         svg.setAttribute( 'width',   pshape.size.w);
         svg.setAttribute( 'height',  pshape.size.h);
-        svg.setAttribute( 'viewBox', "0 0 " + pshape.size.w + " " + pshape.size.h); //IE Fix
         svg.setAttribute( 'class',   "particle " + clss);
         //Add rect to SVG
         svg.appendChild(rect);
@@ -98,15 +103,44 @@ PEmitter.prototype.create = function(){
     //Add svg to HTML container
     this.emter.appendChild( svg );
 
-    //Add moviment tween
-    new TimelineMax({repeat:-1})
-        .from(svg, 0.8,  { alpha:0 }) //Fade int
-        .fromTo(svg, time, {x:fx, y:fy}, { delay:0.2, x:nx, y:ny, z:Math.random() * 100, force3D:true, ease:Linear.easeNone}, "-=0.7")
-        .to(svg, 0.8,  { alpha:0 }) //Fade out
+    //Get emitter opacity for seek interaction
+    var emitterOpacity = this.emter.style.opacity;
+
+    if(this.static){
+      svg.style.transform = "translate3d("+ nx +"px,"+ ny +"px,0)";
+      new TimelineMax().fromTo(svg, 0.8, { alpha:0 }, {alpha:this.opacity}); //Fade int
+    }else{
+      //Add moviment tween
+      new TimelineMax({repeat:-1})
+      .fromTo(svg, 0.8,  { alpha:0 }, {alpha:this.opacity}) //Fade int
+      .fromTo(svg, time, {x:fx, y:fy}, { delay:0.2, x:nx, y:ny, z:this.pz, force3D:true, ease:Linear.easeNone}, "-=0.7")
+      .to(svg, 0.8,  { alpha:0 })//Fade out
+      // .seek(emitterOpacity > 0 ? 0 : Math.random() * time, false)
+    }
 
     //Add rotation tween to collection
+    var rotX, rotY, rotZ;
+    switch(this.rotation){
+      case "x":
+        rotX = 360; rotY = rotZ = 0;
+      break;
+      case "y":
+        rotY = 360; rotX = rotZ = 0;
+      break;
+      case 'z':
+        rotZ = 360; rotY = rotX = 0;
+      break;
+      case false:
+        rotZ = rotY = rotX = 0;
+      break;
+      default:
+      rotX = rotY = rotZ = 360;
+      break;
+    }
+
+    var rD = this.rotDirect == "cw" ? 1: -1;
     tweens.push(
-      TweenMax.to(svg, Math.random() * 30 + 10, { repeat: -1, rotationZ:360, rotationX:360, rotationY:360, ease:Linear.easeNone})
+      TweenMax.to(svg, (Math.random() * this.rotVelVar) + this.rotVel, { repeat: -1, rotationZ:(rotZ*rD), rotationX:(rotX*rD), rotationY:(rotY*rD), ease:Linear.easeNone})
     );
 }
 
